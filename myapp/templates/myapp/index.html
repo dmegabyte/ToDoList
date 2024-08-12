@@ -1,11 +1,52 @@
-{% extends "myapp/main.html" %}
+{% extends 'myapp/main.html' %}
 
 {% block content %}
+  <div>Главная</div>
+  {% comment %}форма ввода{% endcomment %}
+  <details>
+    <div class="main-form">
+      <form method="POST">
+        {% csrf_token %}
+        {{ todoform.as_p }}
 
-<div>Главная</div>
+        <input type="submit" value="send" />
+      </form>
+    </div>
+  </details>
+  {% comment %}отображение тасков{% endcomment %}
 
+  {% for todo in todos %}
+    <div class="todo-container" style="background-color: {{ todo.colour }};">
+      <a href="{% url 'todo_delete' todo.id %}">удалить</a>
+      <a href="{% url 'todo_toggle' todo.id %}">
+        {% if todo.completed %}
+          <img src="/static/checked.png" alt="" />
+        {% else %}
+          <img src="/static/unchecked.png" alt="" />
+        {% endif %}
+      </a>
 
-{% endblock content %}
+      <h4>{{ todo.title }}</h4>
+      <p>{{ todo.text }}</p>
+      <p>Затрачено {{ todo.created_at|timesince }}</p>
 
+      <p>Выполнить в течение {{ todo.deadline|timeuntil }}</p>
+    </div>
+  {% endfor %}
 
-
+  <style>
+    .todo-container {
+      padding: 10px;
+      border: 1px solid black;
+      margin: 10px;
+      border-radius: 5px;
+      width: 300px;
+      box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .colour-control {
+      display: inline-block;
+      margin-right: 10px;
+    }
+  </style>
+{% endblock %}
